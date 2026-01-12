@@ -1,0 +1,59 @@
+{
+  "name": "Set A",
+  "set": [
+    {
+      "chars": "\u5929",
+      "pinyin": "ti\u0101n",
+      "english": "",
+      "index": 0
+    },
+    {
+      "chars": "\u6c14",
+      "pinyin": "q\u00ec",
+      "english": "",
+      "index": 1
+    },
+    {
+      "chars": "\u5f88",
+      "pinyin": "h\u011bn",
+      "english": "very",
+      "index": 2
+    },
+    {
+      "chars": "\u597d",
+      "pinyin": "h\u01ceo",
+      "english": "good",
+      "index": 3
+    },
+    {
+      "chars": "\u51b7",
+      "pinyin": "l\u011bng",
+      "english": "cold",
+      "index": 4
+    },
+    {
+      "chars": "\u5417",
+      "pinyin": "ma",
+      "english": "\uff1f",
+      "index": 5
+    },
+    {
+      "chars": "\u4e0d",
+      "pinyin": "b\u00f9",
+      "english": "not",
+      "index": 6
+    },
+    {
+      "chars": "\u70ed",
+      "pinyin": "r\u00e8",
+      "english": "hot",
+      "index": 7
+    },
+    {
+      "chars": "\u4eca",
+      "pinyin": "j\u012bn",
+      "english": "",
+      "index": 8
+    }
+  ]
+}

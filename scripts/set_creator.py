@@ -1,8 +1,12 @@
 import os
+import sys
 import json
 import gzip
 from PIL import Image
 import subprocess
+import zipfile
+
+import pinyin
 
 
 GRID_SIZE: int = 100
@@ -82,6 +86,20 @@ blank_file = lambda: {
 }
 
 
+def compress_chars(char_dir: str, output_dir: str) -> None:
+    with zipfile.ZipFile(os.path.join(output_dir, 'sets.zip'), 'w') as zf:
+        for s in os.listdir(char_dir):
+            info_path = os.path.join(char_dir, s, 'info.json')
+            if not os.path.exists(info_path):
+                continue
+            info = json.load(open(info_path))
+            name = info['name']
+            zf.write(info_path, f'{name}/info.json')
+            for item in info['set']:
+                char_path = os.path.join(char_dir, s, "characters", f'{item['index']}.png')
+                zf.write(char_path, f'{name}/characters/{item['index']}.png')
+
+
 class RnoteParser:
 
     def __init__(self, fp: str) -> None:
@@ -151,7 +169,53 @@ class RnoteParser:
         return [min(x), min(y), max(x), max(y)]
 
 
-if __name__ == '__main__':
-    parser = RnoteParser('/home/tom/Work/Mandarin/L2/Character Sets/Set A.rnote')
-    parser.export_symbols('chinese')
+class SetAnnotator:
+    
+    def __init__(self, set_path: str) -> None:
+        self.set_path = set_path
+        self.info_file = os.path.join(set_path, 'info.json')
+    
+    def run(self) -> None:
+        data = []
+        name = input('Enter character set name: ').strip() or os.path.basename(self.set_path)
+        for i in range(len(os.listdir(os.path.join(self.set_path, 'characters')))):
+            char_img = Image.open(os.path.join(self.set_path, 'characters', f'{i}.png'))
+            pinyin_img = Image.open(os.path.join(self.set_path, "pinyin", f'{i}.png'))
+            char_img.show()
+            pinyin_img.show()
+            done = False
+            while not done:
+                chars = input('Enter chinese character: ')
+                english = input('Enter english translation: ')
+                done = input('Next? (Y/n)').strip().lower() != 'n'
+            data.append({'chars': chars, 'pinyin': pinyin.get(chars), 'english': english, 'index': i})
+            os.system('taskkill /IM photos.exe /F')
+        info = {'name': name, 'set': data}
+        with open(self.info_file, 'w') as f:
+            f.write(json.dumps(info, indent=2))
 
+def main(argv: list[str]) -> None:
+    if len(argv) == 1:
+        print('usage: set_creator {create,annotate} [args...]')
+        return
+    cmd = argv[1].lower().strip()
+    if cmd == 'create':
+        if len(argv) < 4:
+            print('usage: set_creator create <document-path> <output-dir>')
+            return
+        parser = RnoteParser(argv[2])
+        parser.export_symbols(argv[3])
+    elif cmd == 'annotate':
+        if len(argv) < 3:
+            print('usage: set_creator annotate <set>')
+            return
+        SetAnnotator(argv[2]).run()
+    elif cmd == "zip":
+        if len(argv) < 4:
+            print('usage: set_creator zip <path> <output>')
+            return
+        compress_chars(argv[2], argv[3])
+
+
+if __name__ == '__main__':
+    main(sys.argv)
